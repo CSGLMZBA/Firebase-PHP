@@ -86,4 +86,17 @@ class UserRepository
 
         return $items;
     }
+    public function findAllNotDeleted(): array
+    {
+        return $this->firestore->runQuery([
+            'from' => [
+                ['collectionId' => $this->collection]
+            ],
+            'where' => [
+                'field' => ['fieldPath' => 'deleted'],
+                'op' => 'EQUAL',
+                'value' => ['booleanValue' => false]
+            ]
+        ]);
+    }
 }

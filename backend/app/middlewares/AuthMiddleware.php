@@ -1,29 +1,20 @@
 <?php
-declare(strict_types=1);
-
-namespace App\Middleware;
-
-use App\Utils\AppError;
-use App\Utils\Jwt;
-use App\Utils\Request;
-
 class AuthMiddleware
 {
-    public function __construct(private array $config)
-    {
-    }
 
-    public function handle(Request $request): void
+    public  static function handle(array $appConfig): array
     {
-        $authorization = (string) $request->header('authorization', '');
-
-        if ($authorization === '' || !preg_match('/^Bearer\s+(.+)$/i', $authorization, $matches)) {
-            throw new AppError('No autorizado', 401);
+        $token = Request::bearerToken();
+        if(!$token)
+        {
+            Response::error('No Autorizado', 401);
         }
+        $payload = JwtHelper::verify($token, $appConfig['jwt_secret']);
+        if(!payload)
+        {
+            Response::error('Token invalido o expirado', 401);        
+        }
+        return $payload;
 
-        $token = trim($matches[1]);
-        $payload = Jwt::decode($token, $this->config['jwt_secret']);
-
-        $request->setUser($payload);
     }
 }
