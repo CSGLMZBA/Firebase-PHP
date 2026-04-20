@@ -1,59 +1,47 @@
 <?php
-    declare(strict_types=1);
-    use App\Utils\AppError;
-    use App\Utils\Request;
-    use App\Utils\Response;
 
-    require_once dirname(__DIR__) . 'vendor/autoload.php';
-    $config = require dirname(__DIR__) . 'config/env.php';
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS');
 
-    date_default_timezone_set($config['app_timezone'] ?? 'UTC');
-    mb_internal_encoding('UTF-8');  
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
 
-    // CORS
-    header('Content-Type: application/json; charset=utf-8');
-    header('Access-Control-Allow-Origin: ' . ($config['app_cors_origin'] ?? '*'));
-    header('Access-Control-Allow-Headers: Authorization, Content-Type');
-    header('Access-Control-Allow-Methods: GET, PHST, DELETE, OPTIONS');
-    if(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS')
-    {
-        http_response_code(204);
-        exit;
-    }
+$appConfig = require __DIR__ . '/../app/config/app.php';
+$firebaseConfig = require __DIR__ . '/../app/config/firebase.php';
 
-    //convertimos warnings en excepciones para centralizar errores
+date_default_timezone_set($appConfig['timezone'] ?? 'UTC');
 
-    set_error_handler(function (
-        int $severity,
-        string $message,
-        string $file,
-        int $line
-    ): void {
-        throw new ErrorException($message, 0, $severity, $file, $line);
-    });
+require_once __DIR__ . '/../app/helpers/Response.php';
+require_once __DIR__ . '/../app/helpers/Request.php';
+require_once __DIR__ . '/../app/helpers/JwtHelper.php';
+require_once __DIR__ . '/../app/helpers/FirebaseAuth.php';
+require_once __DIR__ . '/../app/helpers/FirestoreClient.php';
 
-    set_exception_handler( function (Throwable $exception) use
-    ($config): void {
-        if($exception instanceof AppError){
-            $payload = ['message' => $exception->getDetails()];
-            if($exception->getDetails() !== []){
-                $payload['errors'] = $exception->getDetails();
-            }
-            Response::json($payload, $exception->getStatus());
-        }
-        error_log((string) $exception);
-        $payload = [
-            'message' => 'Error Interno del Servidor',
-        ];
-        if (($config['app_debug'] ?? false) ===true ){
-            $payload['error'] = $exception->getMessage();
-            $payload['file'] - $exception->getFile();
-            $payload['line'] = $exception-> GetLine();
-        }
-        Response::json($payload, 500);
-    });
-    $request = new Request();
-    $router = require dirname(__DIR__) . '/app/routes/api.php';
-    $router->dipatch($request);
+require_once __DIR__ . '/../app/schemas/AuthSchema.php';
+require_once __DIR__ . '/../app/schemas/UserSchema.php';
 
-?>
+require_once __DIR__ . '/../app/repositories/UserRepository.php';
+
+require_once __DIR__ . '/../app/services/AuthService.php';
+require_once __DIR__ . '/../app/services/UserService.php';
+
+require_once __DIR__ . '/../app/controllers/AuthController.php';
+require_once __DIR__ . '/../app/controllers/UserController.php';
+
+require_once __DIR__ . '/../app/middlewares/AuthMiddleware.php';
+
+$firestoreClient = new FirestoreClient($firebaseConfig);
+$userRepository = new UserRepository($firestoreClient, $firebaseConfig);
+$authService = new AuthService($userRepository, $appConfig);
+$userService = new UserService($userRepository, $appConfig);
+$authController = new AuthController($authService);
+$userController = new UserController($userService, $appConfig);
+
+$router = require __DIR__ . '/../app/routes/api.php';
+$method = Request::method();
+$path = Request::path();
+
+$router($method, $path, $authController, $userController, $appConfig);
