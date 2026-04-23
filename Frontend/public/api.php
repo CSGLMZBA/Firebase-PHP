@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-define('API_BASE', 'http://localhost:80/backend/public');
+define('API_BASE', 'http://localhost/Firebase-PHP/backend/public');
 
 function apiRequest(string $method, string $endpoint, ?array $body = null, bool $withAuth = true): array
 {

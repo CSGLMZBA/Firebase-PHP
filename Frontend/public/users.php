@@ -28,9 +28,20 @@
         <main class="container py-4">
             <div class="row g-4">
                 <div class="card border-0 shadow-sm">
-                    <hw class="h4 mb-3">
-                        
-                    </hw>
+                    <h2 class="h4 mb-3">
+                        <?= $editItem ? 'Editar Usuario' : 'Nuevo Usuario' ?>
+                    </h2>
+                    <?php if ($message): ?>
+                        <div class="aler alert-success">
+                            <?= htmlspecialchars($message) ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if ($error): ?>
+                        <div class="alert alert-danger">
+                            <?= htmlspecialchars($error) ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </main>
