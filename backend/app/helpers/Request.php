@@ -10,6 +10,12 @@ class Request
     public static function path(): string
     {
         $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+
+        $basePath = '/php-firebase/backend/public';
+        if (str_starts_with($uri, $basePath)) {
+            $uri = substr($uri, strlen($basePath));
+        }
+
         return rtrim($uri, '/') ?: '/';
     }
 
@@ -27,6 +33,12 @@ class Request
     public static function query(string $key, $default = null)
     {
         return $_GET[$key] ?? $default;
+    }
+
+    public static function queryInt(string $key, int $default = 0): int
+    {
+        $value = $_GET[$key] ?? $default;
+        return is_numeric($value) ? (int) $value : $default;
     }
 
     public static function header(string $key): ?string
