@@ -1,15 +1,16 @@
 <?php
-session_start();//funcion de php que guarda quien inicia sesion en ciertas paginas
+session_start();
 
-define('API_BASE', 'http://localhost:80/api');
+define('API_BASE', 'http://localhost:80/backend/public');
 
 function apiRequest(string $method, string $endpoint, ?array $body = null, bool $withAuth = true): array
 {
-    $url = API_BASE . $endpoint;
+    $url = rtrim(API_BASE, '/') . '/' . ltrim($endpoint, '/');
     $ch = curl_init($url);
 
     $headers = [
-        'Content-Type: application/json'
+        'Content-Type: application/json',
+        'Accept: application/json'
     ];
 
     if ($withAuth && !empty($_SESSION['token'])) {
@@ -19,7 +20,8 @@ function apiRequest(string $method, string $endpoint, ?array $body = null, bool 
     $options = [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_CUSTOMREQUEST => $method,
-        CURLOPT_HTTPHEADER => $headers
+        CURLOPT_HTTPHEADER => $headers,
+        CURLOPT_TIMEOUT => 30,
     ];
 
     if ($body !== null) {
@@ -29,14 +31,33 @@ function apiRequest(string $method, string $endpoint, ?array $body = null, bool 
     curl_setopt_array($ch, $options);
 
     $response = curl_exec($ch);
+    $curlError = curl_error($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
     curl_close($ch);
 
+    if ($response === false || $curlError) {
+        return [
+            'status' => 0,
+            'data' => [],
+            'raw' => '',
+            'error' => 'cURL error: ' . $curlError,
+            'content_type' => null,
+        ];
+    }
+
     $decoded = json_decode($response, true);
+    $jsonError = json_last_error();
+
+    if ($httpCode === 401 && $withAuth) {
+        session_destroy();
+    }
 
     return [
         'status' => $httpCode,
         'data' => is_array($decoded) ? $decoded : [],
-        'raw' => $response
+        'raw' => $response,
+        'error' => $jsonError === JSON_ERROR_NONE ? null : json_last_error_msg(),
+        'content_type' => $contentType,
     ];
 }
