@@ -20,7 +20,7 @@ class AuthController
             Response::success($result,200);
         } catch (Exception $e) 
         {
-            Responde::error($e->getMessage(), 401);
+            Response::error($e->getMessage(), 401);
         }
 
     }

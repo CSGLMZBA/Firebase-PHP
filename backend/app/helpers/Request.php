@@ -9,11 +9,20 @@ class Request
 
     public static function path(): string
     {
-        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+        $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+        $basePath = dirname($scriptName);
 
-        $basePath = '/php-firebase/backend/public';
-        if (str_starts_with($uri, $basePath)) {
+        if ($basePath !== '/' && str_starts_with($uri, $basePath)) {
             $uri = substr($uri, strlen($basePath));
+        }
+
+        if (str_starts_with($uri, '/index.php')) {
+            $uri = substr($uri, strlen('/index.php'));
+        }
+
+        if ($uri === '' && !empty($_SERVER['QUERY_STRING']) && str_starts_with($_SERVER['QUERY_STRING'], '/')) {
+            $uri = $_SERVER['QUERY_STRING'];
         }
 
         return rtrim($uri, '/') ?: '/';
