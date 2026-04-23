@@ -1,7 +1,7 @@
 <?php
 session_start();//funcion de php que guarda quien inicia sesion en ciertas paginas
 
-define('API_BASE', 'http://localhost/api');
+define('API_BASE', 'http://localhost:80/api');
 
 function apiRequest(string $method, string $endpoint, ?array $body = null, bool $withAuth = true): array
 {
