@@ -32,6 +32,7 @@ PHP web application with Firebase backend integration, featuring user authentica
    - Ensure `mod_rewrite` is enabled
    - Configure virtual host if needed
    - **Note**: Apache must serve from the Firebase-PHP folder. If `index.php` is set as the default landing page in `dir.conf`, accessing the root URL will automatically redirect to the login page in the public `index.php` file
+   - **Port Configuration**: The project is configured for port 8888. Either run Apache on port 8888 or update the API base URL in `Frontend/public/api.php`
 
 3. **Firebase Setup:**
    - Create a Firebase project at [Firebase Console](https://console.firebase.google.com)
