@@ -18,8 +18,7 @@ $user = $_SESSION['user']??[];
     <title>Dashboard -PHP-</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   </head>
-  <body>
-    <body class="bg-light">
+  <body class="bg-light">
         <nav class="navbar navbar-expand-lg bg-dark navbar-dark shadow-sm">
             <div class="container">
                 <a href="dashboard.php" class="navbar-brand fw-bold">
@@ -35,7 +34,6 @@ $user = $_SESSION['user']??[];
                 </div>
             </div>
         </nav>
-    </body>
 
     <div class="container py-4">
         <div class="card border-0 shadow-sm">
@@ -46,26 +44,29 @@ $user = $_SESSION['user']??[];
                 Bienvenido <?= htmlspecialchars(trim($user['nombre'])??'')?>
             </p>
         </div>
+
         <div class="row g-4 mt-1">
-            <div class="col-md-4"><div class="card boder-0 shadow-sm h-100">
-                <div class="card-body">
-                    <h2 class="h5">Proximamente...</h2>
-                    <p class="mb-0 text-muted">
-                        Paginacion, filtros, busqueda y mas
-                    </p>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h2 class="h5">Proximamente...</h2>
+                        <p class="mb-0 text-muted">
+                            Paginacion, filtros, busqueda y mas
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row g-4 mt-1">
-            <div class="col-md-8"><div class="card boder-0 shadow-sm h-100">
-                <div class="card-body">
-                    <h2 class="h5">Modulo Usuarios</h2>
-                    <p class="mb-0 text-muted">
-                        Gestion de Usuarios del Sistema
-                    </p>
+
+            <div class="col-md-8">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h2 class="h5">Modulo Usuarios</h2>
+                        <p class="mb-0 text-muted">
+                            Gestion de Usuarios del Sistema
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
