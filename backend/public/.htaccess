@@ -1,7 +1,7 @@
 AcceptPathInfo On
 
 RewriteEngine On
-RewriteBase /Firebase-PHP/backend/public/
+RewriteBase /backend/public/
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
